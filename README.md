@@ -10,3 +10,11 @@ MemoryDB	Persistent high-speed application state — carts, sessions, real-time 
 
 S3	File/object storage — images, documents, etc.
 ```
+
+DataBase Schema: 
+```
+Student
+├── name
+├── roll
+└── branch
+```
