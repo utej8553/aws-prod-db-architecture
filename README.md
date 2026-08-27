@@ -18,3 +18,18 @@ Student
 ├── roll
 └── branch
 ```
+
+API's:
+```
+POST   /students
+GET    /students
+GET    /students/{roll}
+PUT    /students/{roll}
+DELETE /students/{roll}
+```
+And we'll eventually have specific demo endpoints where appropriate, e.g.:
+```
+GET /students/{roll}/cache
+GET /students/{roll}/dynamodb
+GET /students/{roll}/memorydb
+```
