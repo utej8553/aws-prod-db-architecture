@@ -1,40 +1,74 @@
 package com.dbarch.main.service;
 
-import com.dbarch.main.model.Student;
-import com.dbarch.main.repository.StudentRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.dbarch.main.model.Student;
+import com.dbarch.main.repository.*;
 
 @Service
 public class StudentService {
-    private final StudentRepository studentRepository;
 
-    public StudentService(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
+    private final DynamoStudentRepository dynamo;
+    private final AuroraStudentRepository aurora;
+    private final ElastiCacheRepository cache;
+    private final MemoryDbRepository memoryDb;
+
+    public StudentService(
+            DynamoStudentRepository dynamo,
+            AuroraStudentRepository aurora,
+            ElastiCacheRepository cache,
+            MemoryDbRepository memoryDb) {
+
+        this.dynamo = dynamo;
+        this.aurora = aurora;
+        this.cache = cache;
+        this.memoryDb = memoryDb;
     }
 
-    public Student createStudent(Student student) {
-        return studentRepository.save(student);
+    public void save(Student student) {
+
+        // Primary databases
+        dynamo.save(student);
+        aurora.save(student);
+
+        // Caches
+        cache.save(student);
+        memoryDb.save(student);
     }
 
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    public Student findByRoll(String roll) {
+
+        // DynamoDB first
+        Student student = dynamo.findByRoll(roll);
+
+        if (student != null) {
+            return student;
+        }
+
+        // Aurora fallback
+        student = aurora.findByRoll(roll);
+
+        if (student != null) {
+            cache.save(student);
+            memoryDb.save(student);
+        }
+
+        return student;
     }
 
-    public Student getStudentByRoll(String roll) {
-        return studentRepository.findByRoll(roll).orElseThrow(() -> new RuntimeException("Student not found: " + roll));
+    public List<Student> findAll() {
+
+        return dynamo.findAll();
     }
 
-    public Student updateStudent(String roll, Student updatedStudent) {
-        Student existingStudent = studentRepository.findByRoll(roll).orElseThrow(() -> new RuntimeException("Student not found: " + roll));
-        existingStudent.setName(updatedStudent.getName());
-        existingStudent.setBranch(updatedStudent.getBranch());
-        return studentRepository.save(existingStudent);
-    }
+    public void delete(String roll) {
 
-    public void deleteStudent(String roll) {
-        Student student = studentRepository.findByRoll(roll).orElseThrow(() -> new RuntimeException("Student not found: " + roll));
-        studentRepository.delete(student);
+        dynamo.delete(roll);
+        aurora.delete(roll);
+
+        cache.delete(roll);
+        memoryDb.delete(roll);
     }
 }

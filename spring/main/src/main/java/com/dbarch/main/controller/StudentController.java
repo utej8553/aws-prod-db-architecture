@@ -1,45 +1,63 @@
 package com.dbarch.main.controller;
 
-import com.dbarch.main.model.Student;
-import com.dbarch.main.service.StudentService;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.dbarch.main.model.Student;
+import com.dbarch.main.service.StudentService;
 
 @RestController
 @RequestMapping("/students")
 public class StudentController {
 
-    private final StudentService studentService;
+    private final StudentService service;
 
-    public StudentController(StudentService studentService) {
-        this.studentService = studentService;
+    public StudentController(StudentService service) {
+        this.service = service;
     }
 
     @PostMapping
-    public ResponseEntity<Student> createStudent(@RequestBody Student student) {
-        return ResponseEntity.ok(studentService.createStudent(student));
-    }
+    public ResponseEntity<String> create(
+            @RequestBody Student student) {
 
-    @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents() {
-        return ResponseEntity.ok(studentService.getAllStudents());
+        service.save(student);
+
+        return ResponseEntity.ok(
+                "Student saved successfully"
+        );
     }
 
     @GetMapping("/{roll}")
-    public ResponseEntity<Student> getStudent(@PathVariable String roll) {
-        return ResponseEntity.ok(studentService.getStudentByRoll(roll));
+    public ResponseEntity<Student> get(
+            @PathVariable String roll) {
+
+        Student student = service.findByRoll(roll);
+
+        if (student == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(student);
     }
 
-    @PutMapping("/{roll}")
-    public ResponseEntity<Student> updateStudent(@PathVariable String roll, @RequestBody Student student) {
-        return ResponseEntity.ok(studentService.updateStudent(roll, student));
+    @GetMapping
+    public ResponseEntity<List<Student>> getAll() {
+
+        return ResponseEntity.ok(
+                service.findAll()
+        );
     }
 
     @DeleteMapping("/{roll}")
-    public ResponseEntity<String> deleteStudent(@PathVariable String roll) {
-        studentService.deleteStudent(roll);
-        return ResponseEntity.ok("Student deleted successfully");
+    public ResponseEntity<String> delete(
+            @PathVariable String roll) {
+
+        service.delete(roll);
+
+        return ResponseEntity.ok(
+                "Student deleted successfully"
+        );
     }
 }
