@@ -28,7 +28,7 @@ public class ElastiCacheRepository {
     }
     public boolean hasItem(String roll) {
         String key = "student:" + roll;
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+        return redisTemplate.hasKey(key) == true;
     }
     public void delete(String roll) {
         String key = "student:" + roll;

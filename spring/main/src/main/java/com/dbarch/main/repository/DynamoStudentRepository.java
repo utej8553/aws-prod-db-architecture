@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import com.dbarch.main.model.Student;
 
@@ -17,6 +18,7 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 
+@Repository
 public class DynamoStudentRepository{
     private final DynamoDbClient dynamoDbClient;
     @Value("${aws.dynamodb.table-name}")
