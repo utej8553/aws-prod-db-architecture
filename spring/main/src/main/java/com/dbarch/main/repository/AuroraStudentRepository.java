@@ -18,7 +18,14 @@ public class AuroraStudentRepository {
         jdbcTemplate.update(sql, student.getRoll(), student.getName(), student.getBranch());
     }
     public Student findByRoll(String roll){
-        String sql = "SELECT roll, name, branch FROM students WHERE roll = ?";
+        String sql = """
+            INSERT INTO students (roll, name, branch)
+            VALUES (?, ?, ?)
+            ON CONFLICT (roll)
+            DO UPDATE SET
+                name = EXCLUDED.name,
+                branch = EXCLUDED.branch
+            """;
         return jdbcTemplate.query(sql, new Object[]{roll}, (rs, rowNum) -> {
             return new Student(rs.getString("name"), rs.getString("roll"), rs.getString("branch"));
         }).stream().findFirst().orElse(null);
