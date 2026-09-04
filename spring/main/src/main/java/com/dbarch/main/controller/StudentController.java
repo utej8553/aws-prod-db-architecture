@@ -31,7 +31,7 @@ public class StudentController {
         return ResponseEntity.ok("Student saved successfully");
     }
     @GetMapping("/{roll}")
-    public ResponseEntity<Student> getMethodName(@RequestParam String roll) {
+    public ResponseEntity<Student> getMethodName(@PathVariable String roll) {
         Student student = studentService.findByRoll(roll);
         if(student == null){
             return ResponseEntity.notFound().build();
