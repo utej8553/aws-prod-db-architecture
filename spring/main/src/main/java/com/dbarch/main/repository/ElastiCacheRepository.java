@@ -13,12 +13,12 @@ public class ElastiCacheRepository {
         this.redisTemplate = redisTemplate;
     }
     public void save(Student student){
-        String key = "student: " + student.getRoll();
+        String key = "student:" + student.getRoll();
         String value = student.getName() + "|" + student.getBranch();
         redisTemplate.opsForValue().set(key, value);
     }
     public Student findByRoll(String roll){
-        String key = "student: " + roll;
+        String key = "student:" + roll;
         String value = redisTemplate.opsForValue().get(key);
         if(value == null){
             return null;
